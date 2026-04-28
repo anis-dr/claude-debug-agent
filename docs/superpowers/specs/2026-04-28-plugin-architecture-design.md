@@ -27,12 +27,12 @@ This spec describes a separate Claude Code plugin that delivers the same capabil
 
 ## Decisions
 
-| Question | Decision |
-|---|---|
-| Repo strategy | Fresh repo, separate from OpenCode plugin |
-| Runtime | Bun + Hono (kept; users must have `bun` on PATH) |
-| Components | Agent + Skill + MCP server with 5 tools |
-| Working dir | `.claude/debug-agent/` inside the consumer's project |
+| Question      | Decision                                             |
+| ------------- | ---------------------------------------------------- |
+| Repo strategy | Fresh repo, separate from OpenCode plugin            |
+| Runtime       | Bun + Hono (kept; users must have `bun` on PATH)     |
+| Components    | Agent + Skill + MCP server with 5 tools              |
+| Working dir   | `.claude/debug-agent/` inside the consumer's project |
 
 ## Architecture
 
@@ -186,13 +186,13 @@ The MCP server **must not write to stdout** — stdio is the protocol channel. A
 
 5 tools, identical semantics to the OpenCode version. Each returns `{ content: [{ type: "text", text: JSON.stringify(...) }] }` per MCP spec.
 
-| Tool | Args | Returns |
-|---|---|---|
-| `debug_start` | `port?: number` | `{port, url, snippet, message}` |
-| `debug_stop` | — | `{message}` |
-| `debug_read` | `tail?: number` | `{entries: [...], count}` when entries exist; `{entries: [], message}` when empty |
-| `debug_clear` | — | `{message}` |
-| `debug_status` | — | `{active, port?, url?, snippet?, persistedPort?, hint?}` |
+| Tool           | Args            | Returns                                                                           |
+| -------------- | --------------- | --------------------------------------------------------------------------------- |
+| `debug_start`  | `port?: number` | `{port, url, snippet, message}`                                                   |
+| `debug_stop`   | —               | `{message}`                                                                       |
+| `debug_read`   | `tail?: number` | `{entries: [...], count}` when entries exist; `{entries: [], message}` when empty |
+| `debug_clear`  | —               | `{message}`                                                                       |
+| `debug_status` | —               | `{active, port?, url?, snippet?, persistedPort?, hint?}`                          |
 
 Schemas declared via the SDK's input schema format (JSON Schema). Tool descriptions copied verbatim from the OpenCode plugin's tool definitions.
 
@@ -299,11 +299,11 @@ debug.port persists for next session
 
 ## Error Handling
 
-| Boundary | Policy | Example |
-|---|---|---|
-| MCP request handler | Catch, return JSON `{error: string}` in tool result | `debug_start` fails → `{error: "Port 3000 in use"}` |
-| HTTP `/log` handler | Catch, return `{success: false, error: ...}` so instrumented code never throws | malformed body → still 200, error logged |
-| Internal (writer, fs) | Best-effort; silent fail for non-critical (gitignore append) | gitignore unwritable → don't block start |
+| Boundary              | Policy                                                                         | Example                                             |
+| --------------------- | ------------------------------------------------------------------------------ | --------------------------------------------------- |
+| MCP request handler   | Catch, return JSON `{error: string}` in tool result                            | `debug_start` fails → `{error: "Port 3000 in use"}` |
+| HTTP `/log` handler   | Catch, return `{success: false, error: ...}` so instrumented code never throws | malformed body → still 200, error logged            |
+| Internal (writer, fs) | Best-effort; silent fail for non-critical (gitignore append)                   | gitignore unwritable → don't block start            |
 
 No retries. No automatic fallback ports unless `port?` arg is explicitly passed.
 
@@ -313,11 +313,11 @@ Diagnostics: `console.error` only (never stdout — that's the MCP channel).
 
 `bun test` (built-in `bun:test` runner — same as the existing OpenCode plugin's tests).
 
-| File | Coverage |
-|---|---|
-| `test/server.test.ts` | start/stop, port persistence, `/log` POST → NDJSON line, `/log` with query string, `/log` with non-JSON body, CORS preflight, `readLogs(tail)`, `clearLogs`, gitignore creation |
-| `test/tools.test.ts` | each of 5 tools: happy path + already-running + not-running cases. Verify return shape (`content[0].text` is valid JSON with expected keys) |
-| `test/snippet.test.ts` | snippet contains correct port, valid JS |
+| File                   | Coverage                                                                                                                                                                        |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `test/server.test.ts`  | start/stop, port persistence, `/log` POST → NDJSON line, `/log` with query string, `/log` with non-JSON body, CORS preflight, `readLogs(tail)`, `clearLogs`, gitignore creation |
+| `test/tools.test.ts`   | each of 5 tools: happy path + already-running + not-running cases. Verify return shape (`content[0].text` is valid JSON with expected keys)                                     |
+| `test/snippet.test.ts` | snippet contains correct port, valid JS                                                                                                                                         |
 
 No mocks for HTTP — start the real Hono server on port 0, hit it. Reuses the existing OpenCode plugin's `server.test.ts` approach.
 
