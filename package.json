@@ -1,0 +1,40 @@
+{
+  "name": "claude-debug-agent",
+  "version": "0.1.0",
+  "description": "Claude Code plugin for runtime debugging - capture and analyze execution data via HTTP instrumentation.",
+  "type": "module",
+  "private": true,
+  "author": {
+    "name": "anis00723",
+    "email": "anis00723@gmail.com"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anis-dr/claude-debug-agent.git"
+  },
+  "homepage": "https://github.com/anis-dr/claude-debug-agent",
+  "keywords": [
+    "claude-code",
+    "claude-plugin",
+    "debug",
+    "debugging",
+    "runtime",
+    "mcp"
+  ],
+  "scripts": {
+    "build": "bun build ./src/index.ts --outdir dist --target bun --format esm",
+    "test": "bun test",
+    "format": "prettier --write \"**/*.{ts,json,md}\"",
+    "format:check": "prettier --check \"**/*.{ts,json,md}\""
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "hono": "^4"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "prettier": "^3",
+    "typescript": "^5"
+  }
+}
