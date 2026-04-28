@@ -1,6 +1,6 @@
 {
   "name": "claude-debug-agent",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Claude Code plugin for runtime debugging - capture and analyze execution data via HTTP instrumentation.",
   "type": "module",
   "private": true,
