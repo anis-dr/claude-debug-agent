@@ -81,17 +81,17 @@ debug_stop           # Stop server
 
 ```javascript
 // Snippet returned by debug_start (port baked in):
-fetch("http://localhost:54321/log", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ label: "LABEL_HERE", data: { YOUR_DATA } }),
+fetch('http://localhost:54321/log', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ label: 'LABEL_HERE', data: { YOUR_DATA } }),
 });
 
 // Used in code:
-fetch("http://localhost:54321/log", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ label: "before-api", data: { userId, params } }),
+fetch('http://localhost:54321/log', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ label: 'before-api', data: { userId, params } }),
 });
 ```
 

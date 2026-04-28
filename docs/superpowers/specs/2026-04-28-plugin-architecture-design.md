@@ -213,7 +213,6 @@ name: debug
 description: Runtime debugging — capture and analyze execution data via HTTP instrumentation. Use for hard-to-reproduce bugs, timing issues, or when you need ground-truth runtime values.
 color: orange
 ---
-
 <role>...</role>
 <context>...</context>
 <workflow>...</workflow>
@@ -231,7 +230,6 @@ Body is the existing `AGENT_PROMPT` from `opencode-debug-agent/src/index.ts` (li
 name: debug
 description: Runtime debugging - instrument code, capture execution data, analyze issues. Use when investigating runtime bugs that need ground-truth variable values.
 ---
-
 <purpose>...</purpose>
 <tools>...</tools>
 <workflow>...</workflow>

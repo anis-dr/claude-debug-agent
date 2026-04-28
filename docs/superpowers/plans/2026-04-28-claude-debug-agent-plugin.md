@@ -59,6 +59,7 @@ claude-debug-agent/
 ```
 
 **Single-responsibility per file:**
+
 - `snippet.ts` — formats the instrumentation snippet given a URL.
 - `server.ts` — runs and supervises the Hono capture server, owns the log file + port file.
 - `tools.ts` — declares the 5 MCP tool definitions and routes calls to `server`/`snippet`.
@@ -69,6 +70,7 @@ claude-debug-agent/
 ## Task 1: Project scaffolding
 
 **Files:**
+
 - Create: `package.json`
 - Create: `tsconfig.json`
 - Create: `.gitignore`
@@ -95,14 +97,7 @@ claude-debug-agent/
     "url": "git+https://github.com/anis-dr/claude-debug-agent.git"
   },
   "homepage": "https://github.com/anis-dr/claude-debug-agent",
-  "keywords": [
-    "claude-code",
-    "claude-plugin",
-    "debug",
-    "debugging",
-    "runtime",
-    "mcp"
-  ],
+  "keywords": ["claude-code", "claude-plugin", "debug", "debugging", "runtime", "mcp"],
   "scripts": {
     "build": "bun build ./src/index.ts --outdir dist --target bun --format esm",
     "test": "bun test",
@@ -207,6 +202,7 @@ All notable changes to this project will be documented in this file.
 Initial release. Port of `opencode-debug-agent` to a Claude Code plugin.
 
 ### Added
+
 - 5 MCP tools: `debug_start`, `debug_stop`, `debug_read`, `debug_clear`, `debug_status`.
 - Debug agent (`/agents debug`) with workflow prompt.
 - Debug skill (`skills/debug`) usable from any agent.
@@ -232,6 +228,7 @@ git commit -m "chore: scaffold project (package, tsconfig, license, changelog)"
 ## Task 2: Snippet helper
 
 **Files:**
+
 - Create: `src/snippet.ts`
 - Create: `test/snippet.test.ts`
 
@@ -303,6 +300,7 @@ git commit -m "feat: add generateSnippet helper"
 ## Task 3: DebugServer (HTTP capture server)
 
 **Files:**
+
 - Create: `src/server.ts`
 - Create: `test/server.test.ts`
 
@@ -824,6 +822,7 @@ git commit -m "feat: add Hono HTTP capture server (DebugServer)"
 ## Task 4: MCP tool handlers
 
 **Files:**
+
 - Create: `src/tools.ts`
 - Create: `test/tools.test.ts`
 
@@ -1171,6 +1170,7 @@ git commit -m "feat: add MCP tool handlers and dispatch"
 ## Task 5: MCP server entrypoint
 
 **Files:**
+
 - Create: `src/index.ts`
 
 The entrypoint wires the MCP SDK's `Server` to `tools` and `dispatch`, and connects it over stdio. No tests in this task — Task 13 (E2E) verifies the wiring end-to-end through real stdio.
@@ -1180,10 +1180,7 @@ The entrypoint wires the MCP SDK's `Server` to `tools` and `dispatch`, and conne
 ```ts
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import {
-  CallToolRequestSchema,
-  ListToolsRequestSchema,
-} from '@modelcontextprotocol/sdk/types.js';
+import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js';
 import { dispatch, tools } from './tools';
 
 const server = new Server(
@@ -1227,6 +1224,7 @@ git commit -m "feat: add MCP server entrypoint (stdio transport)"
 ## Task 6: Build bundle
 
 **Files:**
+
 - Modify: nothing in `src/`
 - Create: `dist/index.js`
 
@@ -1243,9 +1241,11 @@ Expected: same behavior as Task 5 Step 2 — process starts, blocks on stdio, ki
 - [ ] **Step 3: Send a tools/list request to the bundle to confirm protocol works**
 
 Run:
+
 ```bash
 printf '%s\n' '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"test","version":"0"}}}' '{"jsonrpc":"2.0","method":"notifications/initialized"}' '{"jsonrpc":"2.0","id":2,"method":"tools/list"}' | timeout 2 bun dist/index.js | head -20
 ```
+
 Expected: stdout contains a JSON-RPC response with `"id":2` and a `"tools"` array containing 5 entries (`debug_start`, `debug_stop`, `debug_read`, `debug_clear`, `debug_status`).
 
 - [ ] **Step 4: Commit the bundle**
@@ -1260,6 +1260,7 @@ git commit -m "build: commit bundled dist/index.js for plugin distribution"
 ## Task 7: Plugin manifest files
 
 **Files:**
+
 - Create: `.claude-plugin/plugin.json`
 - Create: `.claude-plugin/marketplace.json`
 - Create: `.mcp.json`
@@ -1325,11 +1326,12 @@ git commit -m "feat: add plugin manifest and MCP server declaration"
 ## Task 8: Debug agent
 
 **Files:**
+
 - Create: `agents/debug.md`
 
 - [ ] **Step 1: Create `agents/debug.md`**
 
-```markdown
+````markdown
 ---
 name: debug
 description: Runtime debugging — capture and analyze execution data via HTTP instrumentation. Use for hard-to-reproduce bugs, timing issues, or when you need ground-truth runtime values.
@@ -1350,65 +1352,75 @@ Step 1: Start the debug server
 - Save the returned snippet - it contains the correct port
 
 Step 2: Instrument the code
+
 - Insert the snippet at suspected problem areas
 - Replace `LABEL_HERE` with descriptive names (e.g., "before-db-query", "after-parse")
 - Replace `YOUR_DATA` with variables to capture (e.g., `{userId, response, error}`)
 
 Step 3: Capture data
+
 - Ask user to reproduce the issue
 - The server logs each fetch() call with timestamp
 
 Step 4: Analyze
+
 - Call `debug_read` to get all captured entries
 - Compare expected vs actual values
 - Identify where behavior diverges from expectation
 
 Step 5: Cleanup
+
 - Call `debug_stop`
 - Remove ALL instrumentation fetch() calls from the code
-</workflow>
+  </workflow>
 
 <critical_rules>
+
 - ALWAYS use the snippet from `debug_start` - never hardcode ports
 - Call `debug_status` first if resuming or if instrumentations already exist
 - Search for existing `localhost:\d+/log` patterns before adding new ones
 - ALWAYS remove instrumentation after debugging is complete
-</critical_rules>
+  </critical_rules>
 
 <instrumentation_patterns>
+
 ```javascript
 // Before async operation
-fetch("http://localhost:PORT/log", {
-  method: "POST",
-  headers: {"Content-Type": "application/json"},
-  body: JSON.stringify({label: "pre-api", data: {input, config}})
-})
+fetch('http://localhost:PORT/log', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ label: 'pre-api', data: { input, config } }),
+});
 
 // After receiving result
-fetch("http://localhost:PORT/log", {
-  method: "POST",
-  headers: {"Content-Type": "application/json"},
-  body: JSON.stringify({label: "post-api", data: {result, status}})
-})
+fetch('http://localhost:PORT/log', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ label: 'post-api', data: { result, status } }),
+});
 
 // In error handler
-fetch("http://localhost:PORT/log", {
-  method: "POST",
-  headers: {"Content-Type": "application/json"},
-  body: JSON.stringify({label: "error-caught", data: {error: e.message, stack: e.stack}})
-})
+fetch('http://localhost:PORT/log', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ label: 'error-caught', data: { error: e.message, stack: e.stack } }),
+});
 ```
+````
+
 </instrumentation_patterns>
 
 <analysis_approach>
 When reading logs:
+
 1. Check timestamps - are operations happening in expected order?
 2. Compare pre/post values - did the operation transform data correctly?
 3. Look for missing labels - did execution reach expected points?
 4. Examine error data - what was the actual failure?
 5. Track state changes - how did variables evolve?
-</analysis_approach>
-```
+   </analysis_approach>
+
+````
 
 - [ ] **Step 2: Verify frontmatter parses**
 
@@ -1424,7 +1436,8 @@ console.log(fm);
 if (fm.name !== "debug") { console.error("name mismatch"); process.exit(1); }
 console.log("ok");
 '
-```
+````
+
 Expected: prints `{ name: 'debug', description: '...', color: 'orange' }` then `ok`.
 
 - [ ] **Step 3: Commit**
@@ -1439,11 +1452,12 @@ git commit -m "feat: add debug agent"
 ## Task 9: Debug skill
 
 **Files:**
+
 - Create: `skills/debug/SKILL.md`
 
 - [ ] **Step 1: Create `skills/debug/SKILL.md`**
 
-```markdown
+````markdown
 ---
 name: debug
 description: Runtime debugging - instrument code, capture execution data, analyze issues. Use when investigating runtime bugs that need ground-truth variable values.
@@ -1473,37 +1487,43 @@ Capture runtime data by inserting fetch() calls into code. The debug server rece
 </workflow>
 
 <critical_rules>
+
 - ALWAYS use the snippet from `debug_start` response - never hardcode ports
 - Call `debug_status` first if resuming a session
 - Check for existing `localhost:\d+/log` patterns before instrumenting
 - Remove ALL fetch instrumentation after debugging
-</critical_rules>
+  </critical_rules>
 
 <instrumentation_examples>
+
 ```javascript
 // Capture state before async operation
-fetch("http://localhost:PORT/log", {
-  method: "POST",
-  headers: {"Content-Type": "application/json"},
-  body: JSON.stringify({label: "pre-fetch", data: {userId, params}})
-})
+fetch('http://localhost:PORT/log', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ label: 'pre-fetch', data: { userId, params } }),
+});
 
 // Capture response/error
-fetch("http://localhost:PORT/log", {
-  method: "POST",
-  headers: {"Content-Type": "application/json"},
-  body: JSON.stringify({label: "post-fetch", data: {status, body, error}})
-})
+fetch('http://localhost:PORT/log', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ label: 'post-fetch', data: { status, body, error } }),
+});
 ```
+````
+
 </instrumentation_examples>
 
 <labeling_strategy>
 Use descriptive labels that indicate:
+
 - Location: "auth-middleware", "api-handler", "db-query"
 - Timing: "pre-", "post-", "during-"
 - Context: "user-input", "parsed-config", "error-caught"
-</labeling_strategy>
-```
+  </labeling_strategy>
+
+````
 
 - [ ] **Step 2: Verify file is non-empty and frontmatter is present**
 
@@ -1515,13 +1535,14 @@ Expected: starts with `---`, contains `name: debug`, then `description:`, then `
 ```bash
 git add skills/debug/SKILL.md
 git commit -m "feat: add debug skill"
-```
+````
 
 ---
 
 ## Task 10: README
 
 **Files:**
+
 - Create: `README.md`
 
 - [ ] **Step 1: Create `README.md`**
@@ -1545,10 +1566,11 @@ Claude Code plugin for runtime debugging — capture and analyze execution data 
 - [Bun](https://bun.sh) on your `PATH` (the plugin runs the bundled MCP server with `bun`).
 
 ## Installation
-
 ```
+
 /plugin marketplace add anis-dr/claude-debug-agent
 /plugin install claude-debug-agent@claude-debug-agent
+
 ```
 
 ## Usage
@@ -1558,7 +1580,9 @@ Claude Code plugin for runtime debugging — capture and analyze execution data 
 Switch to the debug agent and describe the issue:
 
 ```
+
 /agents debug
+
 ```
 
 The agent will:
@@ -1573,19 +1597,23 @@ The agent will:
 ### From any agent (skill)
 
 ```
+
 Use the debug skill and help me track down this API timeout.
+
 ```
 
 ### Direct tool calls
 
 ```
-debug_start          # Start server, get an instrumentation snippet
-debug_status         # Check if server running, get port
-debug_read           # Read captured logs
+
+debug_start # Start server, get an instrumentation snippet
+debug_status # Check if server running, get port
+debug_read # Read captured logs
 debug_read(tail: 10) # Last 10 entries
-debug_clear          # Clear log file
-debug_stop           # Stop server
-```
+debug_clear # Clear log file
+debug_stop # Stop server
+
+````
 
 ## How it works
 
@@ -1611,7 +1639,7 @@ fetch("http://localhost:54321/log", {
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({ label: "before-api", data: { userId, params } }),
 });
-```
+````
 
 ## Files written
 
@@ -1635,20 +1663,22 @@ The bundled `dist/index.js` is committed so users don't need to build after inst
 ## License
 
 MIT — see [LICENSE](./LICENSE).
-```
+
+````
 
 - [ ] **Step 2: Commit**
 
 ```bash
 git add README.md
 git commit -m "docs: add README"
-```
+````
 
 ---
 
 ## Task 11: GitHub Actions CI
 
 **Files:**
+
 - Create: `.github/workflows/ci.yml`
 
 - [ ] **Step 1: Create `.github/workflows/ci.yml`**
@@ -1715,6 +1745,7 @@ git commit -m "ci: add GitHub Actions CI workflow"
 ## Task 12: release-please configuration
 
 **Files:**
+
 - Create: `release-please-config.json`
 - Create: `.release-please-manifest.json`
 - Create: `.github/workflows/release.yml`
@@ -1778,6 +1809,7 @@ git commit -m "ci: add release-please configuration"
 ## Task 13: End-to-end smoke test
 
 **Files:**
+
 - Create: `test/e2e.test.ts`
 
 This task spawns the bundled MCP server as a child process, speaks JSON-RPC over its stdio, and asserts that `tools/list` returns the 5 expected tools and that `tools/call` for `debug_status` returns `active=false`.
@@ -1918,6 +1950,7 @@ git commit -m "test: add end-to-end MCP smoke test over stdio"
 ## Task 14: Final formatting + README install verification
 
 **Files:**
+
 - Modify: any files touched by `prettier --write`
 
 - [ ] **Step 1: Run prettier across the repo**

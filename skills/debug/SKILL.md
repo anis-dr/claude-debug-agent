@@ -27,33 +27,37 @@ Capture runtime data by inserting fetch() calls into code. The debug server rece
 </workflow>
 
 <critical_rules>
+
 - ALWAYS use the snippet from `debug_start` response - never hardcode ports
 - Call `debug_status` first if resuming a session
 - Check for existing `localhost:\d+/log` patterns before instrumenting
 - Remove ALL fetch instrumentation after debugging
-</critical_rules>
+  </critical_rules>
 
 <instrumentation_examples>
+
 ```javascript
 // Capture state before async operation
-fetch("http://localhost:PORT/log", {
-  method: "POST",
-  headers: {"Content-Type": "application/json"},
-  body: JSON.stringify({label: "pre-fetch", data: {userId, params}})
-})
+fetch('http://localhost:PORT/log', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ label: 'pre-fetch', data: { userId, params } }),
+});
 
 // Capture response/error
-fetch("http://localhost:PORT/log", {
-  method: "POST",
-  headers: {"Content-Type": "application/json"},
-  body: JSON.stringify({label: "post-fetch", data: {status, body, error}})
-})
+fetch('http://localhost:PORT/log', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ label: 'post-fetch', data: { status, body, error } }),
+});
 ```
+
 </instrumentation_examples>
 
 <labeling_strategy>
 Use descriptive labels that indicate:
+
 - Location: "auth-middleware", "api-handler", "db-query"
 - Timing: "pre-", "post-", "during-"
 - Context: "user-input", "parsed-config", "error-caught"
-</labeling_strategy>
+  </labeling_strategy>
