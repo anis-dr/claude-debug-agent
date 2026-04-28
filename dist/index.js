@@ -15257,7 +15257,8 @@ class DebugServer {
     this.writer = file.writer({ highWaterMark: 1024 * 8 });
     this.server = Bun.serve({
       fetch: app.fetch,
-      port: targetPort
+      port: targetPort,
+      hostname: "127.0.0.1"
     });
     const actualPort = this.server.port ?? 0;
     await this.persistPort(actualPort);
@@ -15336,14 +15337,6 @@ class DebugServer {
     }
   }
   async appendLog(entry) {
-    if (!this.writer) {
-      await mkdir(dirname(this.logFile), { recursive: true });
-      const file = Bun.file(this.logFile);
-      const existing = await file.exists() ? await file.text() : "";
-      await Bun.write(this.logFile, existing + JSON.stringify(entry) + `
-`);
-      return;
-    }
     this.writer.write(JSON.stringify(entry) + `
 `);
   }

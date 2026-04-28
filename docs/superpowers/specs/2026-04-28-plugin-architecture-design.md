@@ -96,7 +96,6 @@ claude-debug-agent/
 ├── tsconfig.json
 ├── .gitignore
 ├── .prettierrc
-├── eslint.config.js
 ├── README.md
 ├── LICENSE                  # MIT
 └── CHANGELOG.md

@@ -77,6 +77,8 @@ debug_stop           # Stop server
 4. **Analyze logs** — `debug_read` returns captured data as structured JSON.
 5. **Clean up** — `debug_stop` and remove instrumentation.
 
+The capture server binds to `127.0.0.1` only — it is not reachable from other hosts on the LAN. CORS is wide-open so browser instrumentation works, but the local-bind keeps the surface limited to the user's own machine.
+
 ### Instrumentation snippet
 
 ```javascript

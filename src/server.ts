@@ -92,9 +92,12 @@ class DebugServer {
     const file = Bun.file(this.logFile);
     this.writer = file.writer({ highWaterMark: 1024 * 8 });
 
+    // Bind to 127.0.0.1 only — debug capture is for the local user's machine,
+    // not the LAN. Bun.serve defaults to 0.0.0.0 if hostname is omitted.
     this.server = Bun.serve({
       fetch: app.fetch,
       port: targetPort,
+      hostname: '127.0.0.1',
     });
 
     const actualPort = this.server.port ?? 0;
@@ -193,15 +196,11 @@ class DebugServer {
   }
 
   private async appendLog(entry: LogEntry): Promise<void> {
-    if (!this.writer) {
-      await mkdir(dirname(this.logFile), { recursive: true });
-      const file = Bun.file(this.logFile);
-      const existing = (await file.exists()) ? await file.text() : '';
-      await Bun.write(this.logFile, existing + JSON.stringify(entry) + '\n');
-      return;
-    }
-
-    this.writer.write(JSON.stringify(entry) + '\n');
+    // Only invoked from the /log handler, which runs only while the server is
+    // up — at which point start() has initialized this.writer. Guarded with !
+    // rather than a fallback path: a non-atomic read-rewrite would race with
+    // the bun writer on concurrent requests.
+    this.writer!.write(JSON.stringify(entry) + '\n');
   }
 
   private async parseRequestBody(req: {
