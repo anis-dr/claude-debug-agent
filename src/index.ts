@@ -30,17 +30,25 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 const transport = new StdioServerTransport();
 
 // stdout is the MCP transport channel; only stderr is safe for diagnostics.
+// process.exit(0) tears down the loop synchronously, so a tools/call response
+// in flight when a signal lands may be lost. Acceptable for v0.1.0 — the client
+// reconnects on plugin restart.
 async function shutdown(signal: string): Promise<void> {
   process.stderr.write(`[claude-debug-agent] received ${signal}, exiting.\n`);
   await debugServer.stop();
   process.exit(0);
 }
 
+function onShutdownError(err: unknown): void {
+  process.stderr.write(`[claude-debug-agent] shutdown error: ${String(err)}\n`);
+  process.exit(1);
+}
+
 process.on('SIGINT', () => {
-  void shutdown('SIGINT');
+  shutdown('SIGINT').catch(onShutdownError);
 });
 process.on('SIGTERM', () => {
-  void shutdown('SIGTERM');
+  shutdown('SIGTERM').catch(onShutdownError);
 });
 
 await server.connect(transport);
