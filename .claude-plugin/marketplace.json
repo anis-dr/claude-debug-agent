@@ -5,7 +5,10 @@
     {
       "name": "claude-debug-agent",
       "description": "Runtime debugging via HTTP instrumentation.",
-      "source": "."
+      "source": {
+        "source": "github",
+        "repo": "anis-dr/claude-debug-agent"
+      }
     }
   ]
 }
