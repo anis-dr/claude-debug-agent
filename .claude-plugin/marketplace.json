@@ -1,0 +1,11 @@
+{
+  "name": "claude-debug-agent",
+  "owner": { "name": "anis00723" },
+  "plugins": [
+    {
+      "name": "claude-debug-agent",
+      "description": "Runtime debugging via HTTP instrumentation.",
+      "source": "."
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "name": "claude-debug-agent",
+  "description": "Runtime debugging for Claude Code — instrument code, capture execution data, analyze issues.",
+  "version": "0.1.0",
+  "author": { "name": "anis00723", "email": "anis00723@gmail.com" },
+  "homepage": "https://github.com/anis-dr/claude-debug-agent",
+  "repository": "https://github.com/anis-dr/claude-debug-agent",
+  "license": "MIT",
+  "keywords": ["claude-code", "claude-plugin", "debug", "debugging", "runtime", "mcp"]
+}
