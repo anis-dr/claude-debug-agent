@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.1](https://github.com/anis-dr/claude-debug-agent/compare/v0.1.0...v0.1.1) (2026-04-28)
+
+
+### Bug Fixes
+
+* **marketplace:** use explicit github source object instead of '.' shorthand ([82d295d](https://github.com/anis-dr/claude-debug-agent/commit/82d295d5bba6e1cbeb17742ceac2a74e78d90bc4))
+
 ## [0.1.0] - 2026-04-28
 
 Initial release. Port of `opencode-debug-agent` to a Claude Code plugin.
